@@ -1,6 +1,10 @@
-def main():
-    print("Hello from cmdx!")
+import typer
 
+app = typer.Typer()
 
-if __name__ == "__main__":
-    main()
+@app.command()
+def ask(query: str):
+    print(f"입력: {query}")
+    
+if __name__=="__main__":
+    app()
