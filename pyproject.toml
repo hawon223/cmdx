@@ -1,0 +1,13 @@
+[project]
+name = "cmdx"
+version = "0.1.0"
+description = "AI-powered safe CLI assistant with command validation and risk analysis"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "google-genai>=2.4.0",
+    "python-dotenv>=1.2.2",
+    "rich>=15.0.0",
+    "typer>=0.25.1",
+]
