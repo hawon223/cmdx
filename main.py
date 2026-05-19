@@ -1,10 +1,18 @@
 import typer
 
+from core.parser import parse
+from core.generator import generate
+
 app = typer.Typer()
 
 @app.command()
 def ask(query: str):
-    print(f"입력: {query}")
-    
-if __name__=="__main__":
+    intent = parse(query)
+
+    command = generate(intent)
+
+    print(f"Intent: {intent}")
+    print(f"Command: {command}")
+
+if __name__ == "__main__":
     app()
