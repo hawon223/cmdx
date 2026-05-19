@@ -13,6 +13,10 @@ def parse(query: str):
             "target": "*.py",
             "recursive": True
         }
+    if "삭제" in query:
+        return {
+        "action": "delete_all"
+        }
 
     return {
         "action": "unknown"
