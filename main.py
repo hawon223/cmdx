@@ -1,16 +1,17 @@
 import typer
 
-from core.parser import parse
+from core.llm_parser import parse_with_gemini
 from core.generator import generate
 from core.risk_analyzer import analyze
 from core.executor import execute
 
 app = typer.Typer()
 
+
 @app.command()
 def ask(query: str):
 
-    intent = parse(query)
+    intent = parse_with_gemini(query)
 
     command = generate(intent)
 
@@ -21,11 +22,11 @@ def ask(query: str):
     print(f"Risk: {risk_result['risk']}")
     print(f"Reason: {risk_result['reason']}")
 
-    confirm = input("\n실행하시겠습니까? (y/n): ")
-    
     if risk_result["risk"] == "HIGH":
         print("\nHIGH RISK COMMAND 차단됨")
         return
+
+    confirm = input("\n실행하시겠습니까? (y/n): ")
 
     if confirm.lower() != "y":
         print("실행 취소")
