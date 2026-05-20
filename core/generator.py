@@ -1,11 +1,12 @@
 from core.os_adapter import get_os
+from core.schema import Intent
 
 
-def generate(intent: dict):
+def generate(intent: Intent):
 
     current_os = get_os()
 
-    action = intent["action"]
+    action = intent.action
 
     if action == "list_files":
 
@@ -16,7 +17,7 @@ def generate(intent: dict):
 
     if action == "find_file":
 
-        target = intent["target"]
+        target = intent.target
 
         if current_os == "windows":
             return f'dir /s {target}'

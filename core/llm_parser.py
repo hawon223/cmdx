@@ -1,5 +1,6 @@
 from google import genai
 from dotenv import load_dotenv
+from core.schema import Intent
 
 import os
 import json
@@ -44,5 +45,9 @@ def parse_with_gemini(query: str):
         .replace("```", "")
         .strip()
     )
+    
+    data = json.loads(cleaned)
 
-    return json.loads(cleaned)
+    intent = Intent(**data)
+
+    return intent
