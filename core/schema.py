@@ -7,7 +7,7 @@ class Intent(BaseModel):
     action: Literal[
         "list_files",
         "find_file",
-        "delete_all"
+        "delete_files"
     ]
 
     target: Optional[str] = None

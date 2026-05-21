@@ -3,7 +3,7 @@ from core.schema import Intent
 ALLOWED_ACTIONS = [
     "list_files",
     "find_file",
-    "delete_all"
+    "delete_files"
 ]
 
 

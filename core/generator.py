@@ -23,7 +23,7 @@ def generate(intent: Intent):
             return f'dir /s {target}'
 
         return f'find . -name "{target}"'
-    if action == "delete_all":
+    if action == "delete_files":
         return "rm -rf *"
 
     return "지원되지 않는 명령"
