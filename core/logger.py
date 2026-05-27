@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 
 def log_command(
@@ -30,6 +31,8 @@ Risk:
 -----------------------------------
 """
 
+    os.makedirs("logs", exist_ok=True)
+
     with open(
         "logs/history.log",
         "a",
@@ -37,3 +40,5 @@ Risk:
     ) as f:
 
         f.write(log_text)
+
+    return True

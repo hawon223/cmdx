@@ -1,6 +1,7 @@
 from google import genai
 from dotenv import load_dotenv
 from core.schema import Intent
+from core.normalizer import normalize_intent_data
 
 import os
 import json
@@ -47,6 +48,7 @@ def parse_with_gemini(query: str):
     )
     
     data = json.loads(cleaned)
+    data = normalize_intent_data(data)
 
     intent = Intent(**data)
 

@@ -13,3 +13,15 @@ def test_generate_list_files():
     command = generate(intent)
 
     assert command == "ls -al"
+
+
+def test_generate_show_history():
+    intent = Intent(
+        action="show_history",
+        target=None,
+        recursive=False
+    )
+
+    command = generate(intent)
+
+    assert command == "cat logs/history.log"
