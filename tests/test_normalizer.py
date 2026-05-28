@@ -13,6 +13,14 @@ def test_normalize_file_alias():
     assert normalize_action("search_file") == "find_file"
 
 
+def test_normalize_pwd_alias():
+    assert normalize_action("show_current_directory") == "pwd"
+
+
+def test_normalize_grep_alias():
+    assert normalize_action("search_text") == "grep"
+
+
 def test_normalize_intent_data_keeps_unknown_action():
     result = normalize_intent_data({"action": "unknown_action"})
 

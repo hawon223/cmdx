@@ -1,5 +1,12 @@
 def parse(query: str):
 
+    if "현재 위치" in query or "어디" in query:
+        return {
+            "action": "pwd",
+            "target": None,
+            "recursive": False
+        }
+
     if "파일 목록" in query:
         return {
             "action": "list_files",

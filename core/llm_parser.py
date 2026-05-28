@@ -20,10 +20,20 @@ def parse_with_gemini(query: str):
 
 반드시 JSON만 출력하세요.
 
+action은 다음 중 하나를 사용하세요:
+list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
+
 예시:
 {{
   "action": "list_files",
   "target": "current_directory",
+  "recursive": false
+}}
+
+{{
+  "action": "grep",
+  "target": "README.md",
+  "pattern": "install",
   "recursive": false
 }}
 

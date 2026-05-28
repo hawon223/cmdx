@@ -4,7 +4,12 @@ ALLOWED_ACTIONS = [
     "list_files",
     "find_file",
     "delete_files",
-    "show_history"
+    "show_history",
+    "pwd",
+    "mkdir",
+    "touch",
+    "cat",
+    "grep"
 ]
 
 

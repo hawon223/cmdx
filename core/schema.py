@@ -8,9 +8,16 @@ class Intent(BaseModel):
         "list_files",
         "find_file",
         "delete_files",
-        "show_history"
+        "show_history",
+        "pwd",
+        "mkdir",
+        "touch",
+        "cat",
+        "grep"
     ]
 
     target: Optional[str] = None
+
+    pattern: Optional[str] = None
 
     recursive: bool = False
