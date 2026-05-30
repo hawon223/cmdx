@@ -17,7 +17,14 @@ app = typer.Typer()
 console = Console()
 
 @app.command()
-def ask(query: str):
+def ask(
+    query: str,
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Show the generated command without executing it."
+    )
+):
     
     try:
         intent = parse_with_gemini(query)
@@ -47,7 +54,8 @@ def ask(query: str):
     risk_styles = {
         "LOW": "green",
         "MEDIUM": "yellow",
-        "HIGH": "bold red"
+        "HIGH": "bold red",
+        "CRITICAL": "bold white on red"
     }
     risk_text = (
         f"[{risk_styles[risk_result['risk']]}]"
@@ -93,7 +101,7 @@ def ask(query: str):
         )
         return
 
-    if risk_result["risk"] == "HIGH":
+    if risk_result["risk"] in ["HIGH", "CRITICAL"]:
         blocked_message = (
             f"Command: {command}\n\n"
             f"Reason:\n{risk_result['reason']}"
@@ -103,6 +111,16 @@ def ask(query: str):
                 Text(blocked_message, style="bold white"),
                 title="Blocked",
                 border_style="red",
+            )
+        )
+        return
+
+    if dry_run:
+        console.print(
+            Panel(
+                Text(command, style="bold white"),
+                title="Dry Run",
+                border_style="cyan",
             )
         )
         return
