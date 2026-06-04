@@ -24,7 +24,7 @@ def test_generate_show_history():
 
     command = generate(intent)
 
-    assert command == "cat logs/history.log"
+    assert command == "cat logs/history.jsonl"
 
 
 def test_generate_pwd():

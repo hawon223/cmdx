@@ -40,9 +40,9 @@ def generate(intent: Intent):
 
     if action == "show_history":
         if current_os == "windows":
-            return "type logs\\history.log"
+            return "type logs\\history.jsonl"
 
-        return "cat logs/history.log"
+        return "cat logs/history.jsonl"
 
     if action == "pwd":
         if current_os == "windows":

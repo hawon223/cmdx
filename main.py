@@ -11,10 +11,54 @@ from core.executor import execute
 from core.validator import validate_intent
 from core.explainer import explain
 from core.policy import check_policy
-from core.logger import log_command
+from core.logger import log_command, read_history
 
 app = typer.Typer()
 console = Console()
+
+
+@app.command()
+def history(
+    limit: int = typer.Option(
+        10,
+        "--limit",
+        "-n",
+        help="Number of history entries to show."
+    )
+):
+    entries = read_history(limit=limit)
+
+    if not entries:
+        console.print("[bold yellow]No history found[/bold yellow]")
+        return
+
+    table = Table(title="Command History")
+    table.add_column("#", justify="right", style="bold cyan")
+    table.add_column("Time", style="white")
+    table.add_column("Risk", style="magenta")
+    table.add_column("Success", style="green")
+    table.add_column("Command", style="white")
+
+    for index, entry in enumerate(entries, start=1):
+        result = entry.get("result", {})
+        success = result.get("success")
+
+        if success is True:
+            success_text = "yes"
+        elif success is False:
+            success_text = "no"
+        else:
+            success_text = "-"
+
+        table.add_row(
+            str(index),
+            entry.get("timestamp", ""),
+            entry.get("risk", ""),
+            success_text,
+            entry.get("command", "")
+        )
+
+    console.print(table)
 
 @app.command()
 def ask(
@@ -136,7 +180,8 @@ def ask(
         query=query,
         intent=intent,
         command=command,
-        risk=risk_result["risk"]
+        risk=risk_result["risk"],
+        result=result
     )
 
     console.print(Panel(Text("Execution Result", style="bold white"), border_style="green"))
@@ -146,8 +191,13 @@ def ask(
             console.print(Panel(result["stdout"], title="stdout", border_style="green"))
         if result["stderr"]:
             console.print(Panel(result["stderr"], title="stderr", border_style="red"))
+    elif result["stderr"]:
+        console.print(Panel(result["stderr"], title="stderr", border_style="red"))
     else:
-        console.print(Panel(result["error"], title="Error", border_style="red"))
+        error_message = result["error"] or (
+            f"Command failed with return code {result['returncode']}"
+        )
+        console.print(Panel(error_message, title="Error", border_style="red"))
 
 if __name__ == "__main__":
     app()
