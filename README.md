@@ -19,6 +19,35 @@ OS마다 명령어가 다르고,
 - Risk analysis
 - Command explanation
 
+## Installation
+
+Recommended for local development:
+
+```bash
+uv run cmdx --help
+```
+
+If you prefer a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+## Usage
+
+```bash
+uv run cmdx ask "파일 목록 보여줘" --dry-run
+uv run cmdx history
+```
+
+`ask` uses the Gemini API, so set `GEMINI_API_KEY` before running it.
+
+```bash
+export GEMINI_API_KEY="your-api-key"
+```
+
 ## Tech Stack
 
 - Python

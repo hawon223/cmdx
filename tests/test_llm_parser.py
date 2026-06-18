@@ -6,6 +6,14 @@ os.environ.setdefault("GEMINI_API_KEY", "test-api-key")
 from core import llm_parser
 
 
+def fake_client(text):
+    return SimpleNamespace(
+        models=SimpleNamespace(
+            generate_content=lambda model, contents: SimpleNamespace(text=text)
+        )
+    )
+
+
 def test_build_prompt_includes_query_and_few_shot_examples():
     prompt = llm_parser.build_prompt("히스토리 보여줘")
 
@@ -25,9 +33,11 @@ def test_parse_with_gemini_strips_markdown_json_fence(monkeypatch):
         )
 
     monkeypatch.setattr(
-        llm_parser.client.models,
-        "generate_content",
-        fake_generate_content
+        llm_parser,
+        "get_client",
+        lambda: SimpleNamespace(
+            models=SimpleNamespace(generate_content=fake_generate_content)
+        )
     )
 
     intent = llm_parser.parse_with_gemini("파일 목록 보여줘")
@@ -37,13 +47,10 @@ def test_parse_with_gemini_strips_markdown_json_fence(monkeypatch):
 
 
 def test_parse_with_gemini_normalizes_action_alias(monkeypatch):
-    def fake_generate_content(model, contents):
-        return SimpleNamespace(text='{"action": "view_history"}')
-
     monkeypatch.setattr(
-        llm_parser.client.models,
-        "generate_content",
-        fake_generate_content
+        llm_parser,
+        "get_client",
+        lambda: fake_client('{"action": "view_history"}')
     )
 
     intent = llm_parser.parse_with_gemini("히스토리 보여줘")
