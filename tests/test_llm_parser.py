@@ -1,0 +1,51 @@
+import os
+from types import SimpleNamespace
+
+os.environ.setdefault("GEMINI_API_KEY", "test-api-key")
+
+from core import llm_parser
+
+
+def test_build_prompt_includes_query_and_few_shot_examples():
+    prompt = llm_parser.build_prompt("히스토리 보여줘")
+
+    assert "{{USER_QUERY}}" not in prompt
+    assert "히스토리 보여줘" in prompt
+    assert "view_history, display_history, history -> show_history" in prompt
+    assert '"action": "show_history"' in prompt
+
+
+def test_parse_with_gemini_strips_markdown_json_fence(monkeypatch):
+    def fake_generate_content(model, contents):
+        assert model == "gemini-2.5-flash"
+        assert "파일 목록 보여줘" in contents
+        assert "마크다운 코드블록, 설명 문장, 주석은 출력하지 마세요." in contents
+        return SimpleNamespace(
+            text='```json\n{"action": "list_files", "recursive": false}\n```'
+        )
+
+    monkeypatch.setattr(
+        llm_parser.client.models,
+        "generate_content",
+        fake_generate_content
+    )
+
+    intent = llm_parser.parse_with_gemini("파일 목록 보여줘")
+
+    assert intent.action == "list_files"
+    assert intent.recursive is False
+
+
+def test_parse_with_gemini_normalizes_action_alias(monkeypatch):
+    def fake_generate_content(model, contents):
+        return SimpleNamespace(text='{"action": "view_history"}')
+
+    monkeypatch.setattr(
+        llm_parser.client.models,
+        "generate_content",
+        fake_generate_content
+    )
+
+    intent = llm_parser.parse_with_gemini("히스토리 보여줘")
+
+    assert intent.action == "show_history"

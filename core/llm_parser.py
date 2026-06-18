@@ -5,6 +5,7 @@ from core.normalizer import normalize_intent_data
 
 import os
 import json
+from pathlib import Path
 
 load_dotenv()
 
@@ -12,34 +13,17 @@ client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
+PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / "parser_prompt.txt"
+
+
+def build_prompt(query: str):
+    template = PROMPT_PATH.read_text(encoding="utf-8")
+    return template.replace("{{USER_QUERY}}", query)
+
 
 def parse_with_gemini(query: str):
 
-    prompt = f"""
-사용자의 요청을 JSON intent로 변환하세요.
-
-반드시 JSON만 출력하세요.
-
-action은 다음 중 하나를 사용하세요:
-list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
-
-예시:
-{{
-  "action": "list_files",
-  "target": "current_directory",
-  "recursive": false
-}}
-
-{{
-  "action": "grep",
-  "target": "README.md",
-  "pattern": "install",
-  "recursive": false
-}}
-
-사용자 입력:
-{query}
-"""
+    prompt = build_prompt(query)
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
