@@ -23,7 +23,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 py-modules = ["main"]
-packages = ["core", "prompts"]
+packages = ["core", "core.tools", "prompts"]
 
 [tool.setuptools.package-data]
 prompts = ["*.txt"]
