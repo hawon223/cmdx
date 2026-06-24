@@ -53,3 +53,25 @@ def test_read_history_returns_recent_entries(tmp_path):
 
     assert len(entries) == 1
     assert entries[0]["query"] == "second"
+
+
+def test_log_command_accepts_fallback_intent_dict(tmp_path):
+    log_path = tmp_path / "history.jsonl"
+
+    result = log_command(
+        query="git 상태 보여줘",
+        intent={
+            "action": "ai_fallback",
+            "reason": "Invalid action: git_status"
+        },
+        command="git status",
+        risk="LOW",
+        log_path=str(log_path)
+    )
+
+    assert result is True
+
+    log_entry = json.loads(log_path.read_text(encoding="utf-8").strip())
+
+    assert log_entry["intent"]["action"] == "ai_fallback"
+    assert log_entry["command"] == "git status"

@@ -5,6 +5,7 @@ from rich.table import Table
 from rich.text import Text
 
 from core.llm_parser import parse_with_gemini
+from core.fallback import suggest_command_with_gemini
 from core.generator import generate
 from core.risk_analyzer import analyze
 from core.executor import execute
@@ -69,31 +70,55 @@ def ask(
         help="Show the generated command without executing it."
     )
 ):
-    
+    fallback_used = False
+
     try:
         intent = parse_with_gemini(query)
         validate_intent(intent)
+        command = generate(intent)
     except Exception as e:
-        console.print(
-            Panel(
-                Text(str(e), style="bold white"),
-                title="Intent Validation Error",
-                border_style="red",
+        try:
+            command = suggest_command_with_gemini(query)
+            fallback_used = True
+            intent = {
+                "action": "ai_fallback",
+                "reason": str(e)
+            }
+        except Exception as fallback_error:
+            error_message = (
+                f"Intent error: {e}\n\n"
+                f"Fallback error: {fallback_error}"
             )
-        )
-        return
+            console.print(
+                Panel(
+                    Text(error_message, style="bold white"),
+                    title="Intent Validation Error",
+                    border_style="red",
+                )
+            )
+            return
 
 
-    command = generate(intent)
     risk_result = analyze(command)
 
     intent_table = Table.grid(padding=(0, 1), expand=True)
     intent_table.add_column("Field", style="bold blue")
     intent_table.add_column("Value", style="white")
-    intent_table.add_row("Action", intent.action)
-    intent_table.add_row("Target", str(intent.target))
-    intent_table.add_row("Recursive", str(intent.recursive))
-    console.print(Panel(intent_table, title="Intent", border_style="blue"))
+    if fallback_used:
+        intent_table.add_row("Action", intent["action"])
+        intent_table.add_row("Reason", intent["reason"])
+        intent_table.add_row("Source", "AI Fallback")
+    else:
+        intent_table.add_row("Action", intent.action)
+        intent_table.add_row("Target", str(intent.target))
+        intent_table.add_row("Recursive", str(intent.recursive))
+    console.print(
+        Panel(
+            intent_table,
+            title="Fallback Intent" if fallback_used else "Intent",
+            border_style="blue"
+        )
+    )
 
     risk_styles = {
         "LOW": "green",

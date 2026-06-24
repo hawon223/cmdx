@@ -16,7 +16,7 @@ def log_command(
     log_entry = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "query": query,
-        "intent": intent.model_dump(),
+        "intent": _serialize_intent(intent),
         "command": command,
         "risk": risk,
     }
@@ -45,6 +45,16 @@ def log_command(
         f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
 
     return True
+
+
+def _serialize_intent(intent):
+    if hasattr(intent, "model_dump"):
+        return intent.model_dump()
+
+    if isinstance(intent, dict):
+        return intent
+
+    return None
 
 
 def read_history(limit=10, log_path=LOG_PATH):
