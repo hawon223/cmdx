@@ -1,0 +1,80 @@
+사용자의 요청을 실행 계획 JSON으로 변환하세요.
+
+반드시 JSON만 출력하세요.
+마크다운 코드블록, 설명 문장, 주석은 출력하지 마세요.
+
+중요:
+- shell command를 직접 만들지 마세요.
+- 등록된 action만 사용하세요.
+- 각 step은 하나의 tool 실행을 의미합니다.
+- steps는 1개 이상 5개 이하로 작성하세요.
+
+지원 action:
+list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
+
+비슷한 표현은 아래 표준 action으로 맞추세요:
+- view_history, display_history, history -> show_history
+- current_directory, print_working_directory, where_am_i -> pwd
+- search_file, search_files, find_files -> find_file
+- search_text, find_text, search_in_file -> grep
+- create_directory, make_directory, new_directory -> mkdir
+- create_file, new_file -> touch
+- read_file, show_file, display_file -> cat
+
+출력 스키마:
+{
+  "goal": "사용자의 목표를 한 문장으로 요약",
+  "steps": [
+    {
+      "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep",
+      "target": "optional target path or name",
+      "pattern": "optional search pattern",
+      "recursive": false,
+      "reason": "이 step이 필요한 이유"
+    }
+  ]
+}
+
+예시 1
+사용자:
+README 찾아서 보여줘
+
+출력:
+{
+  "goal": "README 파일을 찾아 내용을 출력한다",
+  "steps": [
+    {
+      "action": "find_file",
+      "target": "README.md",
+      "recursive": false,
+      "reason": "README 파일의 위치를 찾기 위해 필요하다"
+    },
+    {
+      "action": "cat",
+      "target": "README.md",
+      "recursive": false,
+      "reason": "찾은 README 파일의 내용을 출력하기 위해 필요하다"
+    }
+  ]
+}
+
+예시 2
+사용자:
+README에서 install 찾아줘
+
+출력:
+{
+  "goal": "README에서 install 문자열을 검색한다",
+  "steps": [
+    {
+      "action": "grep",
+      "target": "README.md",
+      "pattern": "install",
+      "recursive": false,
+      "reason": "README 파일에서 install 문자열을 찾기 위해 필요하다"
+    }
+  ]
+}
+
+사용자 입력:
+{{USER_QUERY}}
