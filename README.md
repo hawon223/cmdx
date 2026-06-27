@@ -241,12 +241,12 @@ cmdX는 아직 완전한 의미의 autonomous agent는 아닙니다.
 
 ```text
 Multi-step Tool Execution
-Observation
 Reflection
 Self-correction
 ```
 
 Planner는 v2 기반 작업으로 추가되었지만, 아직 실제 multi-step 실행 루프와 연결되지는 않았습니다.
+Observation도 실행 결과를 구조화하는 기반만 추가되었고, 아직 agent loop의 다음 판단에는 연결되지 않았습니다.
 
 따라서 이 프로젝트는 `AI Shell Agent`라기보다 **Safe AI CLI** 또는 **Trustworthy AI Shell Assistant**에 가깝습니다.
 
@@ -291,8 +291,8 @@ README 발견
 v2 작업 단계:
 
 ```text
-PHASE 11 Planner                         진행 중
-PHASE 12 Observation                     예정
+PHASE 11 Planner                         기반 추가
+PHASE 12 Observation                     기반 추가
 PHASE 13 Multi-step Agent Loop           예정
 PHASE 14 Reflection                      예정
 PHASE 15 Tool Expansion                  예정
@@ -310,6 +310,7 @@ cmdx/
 │   ├── generator.py
 │   ├── llm_parser.py
 │   ├── logger.py
+│   ├── observation.py
 │   ├── plan_schema.py
 │   ├── planner.py
 │   ├── policy.py
