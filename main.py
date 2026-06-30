@@ -4,6 +4,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from core.agent import run_agent
 from core.llm_parser import parse_with_gemini
 from core.fallback import suggest_command_with_gemini
 from core.generator import generate
@@ -60,6 +61,75 @@ def history(
         )
 
     console.print(table)
+
+
+@app.command()
+def agent(
+    query: str,
+    execute_steps: bool = typer.Option(
+        False,
+        "--execute",
+        help="Execute each safe planned step. Defaults to dry-run."
+    ),
+    max_steps: int = typer.Option(
+        3,
+        "--max-steps",
+        help="Maximum number of plan steps to process."
+    )
+):
+    try:
+        result = run_agent(
+            query=query,
+            dry_run=not execute_steps,
+            max_steps=max_steps
+        )
+    except Exception as e:
+        console.print(
+            Panel(
+                Text(str(e), style="bold white"),
+                title="Agent Error",
+                border_style="red",
+            )
+        )
+        return
+
+    summary = Table.grid(padding=(0, 1), expand=True)
+    summary.add_column("Field", style="bold blue")
+    summary.add_column("Value", style="white")
+    summary.add_row("Goal", result.goal)
+    summary.add_row("Mode", "execute" if execute_steps else "dry-run")
+    summary.add_row("Completed", str(result.completed))
+    if result.stopped_reason:
+        summary.add_row("Stopped Reason", result.stopped_reason)
+    console.print(Panel(summary, title="Agent Plan", border_style="blue"))
+
+    table = Table(title="Agent Steps")
+    table.add_column("#", justify="right", style="bold cyan")
+    table.add_column("Action", style="white")
+    table.add_column("Status", style="magenta")
+    table.add_column("Risk", style="yellow")
+    table.add_column("Command", style="white")
+
+    for step in result.steps:
+        table.add_row(
+            str(step.step_index),
+            step.action,
+            step.status,
+            step.risk,
+            step.command
+        )
+
+    console.print(table)
+
+    for step in result.steps:
+        if step.observation:
+            console.print(
+                Panel(
+                    step.observation.summary,
+                    title=f"Observation #{step.step_index}",
+                    border_style="green" if step.observation.success else "red"
+                )
+            )
 
 @app.command()
 def ask(

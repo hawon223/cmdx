@@ -228,6 +228,7 @@ cmdX는 아직 완전한 의미의 autonomous agent는 아닙니다.
 현재 구조는 아래에 가깝습니다.
 
 ```text
+ask 명령:
 한 질문
   ↓
 한 intent
@@ -235,18 +236,25 @@ cmdX는 아직 완전한 의미의 autonomous agent는 아닙니다.
 한 tool
   ↓
 한 command
+
+agent 명령:
+한 질문
+  ↓
+plan
+  ↓
+여러 tool step
+  ↓
+step별 command / risk / policy / observation
 ```
 
 아직 아래 기능은 구현되어 있지 않습니다.
 
 ```text
-Multi-step Tool Execution
 Reflection
 Self-correction
 ```
 
-Planner는 v2 기반 작업으로 추가되었지만, 아직 실제 multi-step 실행 루프와 연결되지는 않았습니다.
-Observation도 실행 결과를 구조화하는 기반만 추가되었고, 아직 agent loop의 다음 판단에는 연결되지 않았습니다.
+Planner, Observation, multi-step agent loop의 기반은 추가되었지만, 아직 Reflection 기반 자기 수정까지는 연결되지 않았습니다.
 
 따라서 이 프로젝트는 `AI Shell Agent`라기보다 **Safe AI CLI** 또는 **Trustworthy AI Shell Assistant**에 가깝습니다.
 
@@ -293,7 +301,7 @@ v2 작업 단계:
 ```text
 PHASE 11 Planner                         기반 추가
 PHASE 12 Observation                     기반 추가
-PHASE 13 Multi-step Agent Loop           예정
+PHASE 13 Multi-step Agent Loop           기반 추가
 PHASE 14 Reflection                      예정
 PHASE 15 Tool Expansion                  예정
 PHASE 16 Session Memory                  예정
@@ -306,6 +314,7 @@ PHASE 17 Portfolio Demo                  예정
 cmdx/
 ├── main.py
 ├── core/
+│   ├── agent.py
 │   ├── fallback.py
 │   ├── generator.py
 │   ├── llm_parser.py
@@ -431,6 +440,18 @@ uv run cmdx --help
 uv run cmdx ask "파일 목록 보여줘" --dry-run
 ```
 
+Planner 기반 multi-step agent dry-run:
+
+```bash
+uv run cmdx agent "README 찾아서 보여줘"
+```
+
+안전한 step을 실제 실행까지 진행하기:
+
+```bash
+uv run cmdx agent "README 찾아서 보여줘" --execute
+```
+
 실행 history 확인:
 
 ```bash
@@ -488,6 +509,7 @@ uv run pytest -q
 uv run pytest tests/test_generator.py -q
 uv run pytest tests/test_tool_registry.py -q
 uv run pytest tests/test_fallback.py -q
+uv run pytest tests/test_agent.py -q
 ```
 
 테스트 범위:
@@ -503,6 +525,7 @@ executor
 logger
 llm parser
 AI fallback
+agent loop
 explainer
 ```
 
