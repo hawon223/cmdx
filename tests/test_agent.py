@@ -1,6 +1,8 @@
 from core import agent
-from core.agent import plan_step_to_intent, run_agent
+from core.agent import plan_step_to_intent, run_agent, safe_reflect_on_failure
+from core.observation import Observation
 from core.plan_schema import Plan, PlanStep
+from core.reflection import Reflection
 
 
 def test_plan_step_to_intent():
@@ -140,6 +142,15 @@ def test_run_agent_stops_on_execution_failure(monkeypatch):
             "error": None,
         }
     )
+    monkeypatch.setattr(
+        agent,
+        "safe_reflect_on_failure",
+        lambda query, goal, failed_step, observation: Reflection(
+            status="retry",
+            reason="missing.txt 경로를 다시 찾아야 한다",
+            next_step=PlanStep(action="find_file", target="missing.txt")
+        )
+    )
 
     result = run_agent(
         query="없는 파일 보여줘",
@@ -150,6 +161,9 @@ def test_run_agent_stops_on_execution_failure(monkeypatch):
     assert result.completed is False
     assert len(result.steps) == 1
     assert result.steps[0].status == "failed"
+    assert result.steps[0].reflection is not None
+    assert result.steps[0].reflection.status == "retry"
+    assert result.steps[0].reflection.next_step.action == "find_file"
     assert result.stopped_reason == (
         "Command failed with stderr: No such file or directory"
     )
@@ -179,3 +193,29 @@ def test_run_agent_respects_max_steps(monkeypatch):
     assert result.completed is False
     assert len(result.steps) == 1
     assert result.stopped_reason == "Stopped after max_steps=1"
+
+
+def test_safe_reflect_on_failure_returns_stop_when_reflection_fails(monkeypatch):
+    def raise_error(query, goal, failed_step, observation):
+        raise ValueError("invalid reflection")
+
+    monkeypatch.setattr(agent, "reflect_on_failure", raise_error)
+
+    result = safe_reflect_on_failure(
+        query="없는 파일 보여줘",
+        goal="없는 파일을 출력한다",
+        failed_step=PlanStep(action="cat", target="missing.txt"),
+        observation=Observation(
+            step_index=1,
+            action="cat",
+            command="cat missing.txt",
+            success=False,
+            returncode=1,
+            stderr="No such file or directory\n",
+            summary="Command failed with stderr: No such file or directory"
+        )
+    )
+
+    assert result.status == "stop"
+    assert result.reason == "Reflection failed: invalid reflection"
+    assert result.next_step is None

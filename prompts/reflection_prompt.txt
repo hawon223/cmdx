@@ -1,0 +1,73 @@
+실패한 agent step의 observation을 보고 다음 행동을 판단하세요.
+
+반드시 JSON만 출력하세요.
+마크다운 코드블록, 설명 문장, 주석은 출력하지 마세요.
+
+가능한 status:
+- retry: 다른 action 또는 target으로 다시 시도해야 함
+- continue: 실패했지만 다음 step을 계속 진행해도 됨
+- stop: 더 진행하지 않는 것이 안전하거나 의미 없음
+
+중요:
+- shell command를 직접 만들지 마세요.
+- next_step이 필요하면 등록된 action만 사용하세요.
+- 위험하거나 파괴적인 action을 제안하지 마세요.
+
+지원 action:
+list_files, find_file, show_history, pwd, mkdir, touch, cat, grep
+
+출력 스키마:
+{
+  "status": "retry | continue | stop",
+  "reason": "판단 이유",
+  "next_step": {
+    "action": "optional supported action",
+    "target": "optional target path or name",
+    "pattern": "optional search pattern",
+    "recursive": false,
+    "reason": "이 step이 필요한 이유"
+  }
+}
+
+예시 1
+입력:
+goal: README 파일을 찾아 내용을 출력한다
+failed_step: {"action": "cat", "target": "README.md"}
+observation: Command failed with stderr: No such file or directory
+
+출력:
+{
+  "status": "retry",
+  "reason": "README.md 경로가 현재 위치와 다를 수 있으므로 먼저 파일 위치를 찾아야 한다",
+  "next_step": {
+    "action": "find_file",
+    "target": "README.md",
+    "recursive": false,
+    "reason": "README.md 파일 위치를 찾기 위해 필요하다"
+  }
+}
+
+예시 2
+입력:
+goal: 파일 목록을 확인한다
+failed_step: {"action": "list_files"}
+observation: Command failed with error: subprocess unavailable
+
+출력:
+{
+  "status": "stop",
+  "reason": "명령 실행 환경 자체에 문제가 있어 재시도해도 의미가 낮다",
+  "next_step": null
+}
+
+사용자 요청:
+{{USER_QUERY}}
+
+목표:
+{{GOAL}}
+
+실패한 step:
+{{FAILED_STEP}}
+
+Observation:
+{{OBSERVATION}}

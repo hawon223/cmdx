@@ -250,11 +250,11 @@ step별 command / risk / policy / observation
 아직 아래 기능은 구현되어 있지 않습니다.
 
 ```text
-Reflection
-Self-correction
+Automatic retry
+Self-correction loop
 ```
 
-Planner, Observation, multi-step agent loop의 기반은 추가되었지만, 아직 Reflection 기반 자기 수정까지는 연결되지 않았습니다.
+Planner, Observation, multi-step agent loop, Reflection의 기반은 추가되었지만, 아직 reflection 결과를 바탕으로 자동 재시도하는 self-correction loop까지는 연결되지 않았습니다.
 
 따라서 이 프로젝트는 `AI Shell Agent`라기보다 **Safe AI CLI** 또는 **Trustworthy AI Shell Assistant**에 가깝습니다.
 
@@ -302,7 +302,7 @@ v2 작업 단계:
 PHASE 11 Planner                         기반 추가
 PHASE 12 Observation                     기반 추가
 PHASE 13 Multi-step Agent Loop           기반 추가
-PHASE 14 Reflection                      예정
+PHASE 14 Reflection                      기반 추가
 PHASE 15 Tool Expansion                  예정
 PHASE 16 Session Memory                  예정
 PHASE 17 Portfolio Demo                  예정
@@ -323,6 +323,7 @@ cmdx/
 │   ├── plan_schema.py
 │   ├── planner.py
 │   ├── policy.py
+│   ├── reflection.py
 │   ├── risk_analyzer.py
 │   ├── schema.py
 │   ├── validator.py
@@ -333,7 +334,8 @@ cmdx/
 ├── prompts/
 │   ├── parser_prompt.txt
 │   ├── command_fallback_prompt.txt
-│   └── planner_prompt.txt
+│   ├── planner_prompt.txt
+│   └── reflection_prompt.txt
 └── tests/
 ```
 
@@ -526,6 +528,7 @@ logger
 llm parser
 AI fallback
 agent loop
+reflection
 explainer
 ```
 

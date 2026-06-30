@@ -130,6 +130,23 @@ def agent(
                     border_style="green" if step.observation.success else "red"
                 )
             )
+        if step.reflection:
+            reflection_text = (
+                f"Status: {step.reflection.status}\n"
+                f"Reason: {step.reflection.reason}"
+            )
+            if step.reflection.next_step:
+                reflection_text += (
+                    "\nNext Step: "
+                    f"{step.reflection.next_step.action}"
+                )
+            console.print(
+                Panel(
+                    reflection_text,
+                    title=f"Reflection #{step.step_index}",
+                    border_style="yellow"
+                )
+            )
 
 @app.command()
 def ask(

@@ -8,6 +8,7 @@ from core.observation import Observation, observe_result
 from core.plan_schema import PlanStep
 from core.planner import parse_plan_with_gemini
 from core.policy import check_policy
+from core.reflection import Reflection, reflect_on_failure
 from core.risk_analyzer import analyze
 from core.schema import Intent
 
@@ -24,6 +25,7 @@ class AgentStepResult(BaseModel):
     policy_reason: str
     status: Literal["dry_run", "executed", "blocked", "failed"]
     observation: Optional[Observation] = None
+    reflection: Optional[Reflection] = None
 
 
 class AgentRunResult(BaseModel):
@@ -123,6 +125,13 @@ def run_agent(query: str, dry_run: bool = True, max_steps: int = 3):
         )
 
         if not observation.success:
+            reflection = safe_reflect_on_failure(
+                query=query,
+                goal=plan.goal,
+                failed_step=step,
+                observation=observation
+            )
+            result.steps[-1].reflection = reflection
             result.completed = False
             result.stopped_reason = observation.summary
             break
@@ -132,6 +141,27 @@ def run_agent(query: str, dry_run: bool = True, max_steps: int = 3):
         result.stopped_reason = f"Stopped after max_steps={max_steps}"
 
     return result
+
+
+def safe_reflect_on_failure(
+    query: str,
+    goal: str,
+    failed_step: PlanStep,
+    observation: Observation
+):
+    try:
+        return reflect_on_failure(
+            query=query,
+            goal=goal,
+            failed_step=failed_step,
+            observation=observation
+        )
+    except Exception as e:
+        return Reflection(
+            status="stop",
+            reason=f"Reflection failed: {e}",
+            next_step=None
+        )
 
 
 def build_step_result(
