@@ -11,7 +11,12 @@ ALLOWED_ACTIONS = [
     "cat",
     "grep",
     "git_status",
-    "git_log"
+    "git_log",
+    "head",
+    "tail",
+    "wc",
+    "git_diff",
+    "git_branch"
 ]
 
 

@@ -10,7 +10,7 @@
 - steps는 1개 이상 5개 이하로 작성하세요.
 
 지원 action:
-list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log
+list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log, head, tail, wc, git_diff, git_branch
 
 비슷한 표현은 아래 표준 action으로 맞추세요:
 - view_history, display_history, history -> show_history
@@ -22,15 +22,20 @@ list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep,
 - read_file, show_file, display_file -> cat
 - show_git_status, git_state, repository_status -> git_status
 - show_git_log, git_history, commit_history -> git_log
+- show_head, file_head, first_lines -> head
+- show_tail, file_tail, last_lines -> tail
+- line_count, count_lines, word_count -> wc
+- show_git_diff, git_changes, repository_diff -> git_diff
+- show_git_branch, current_branch, current_git_branch -> git_branch
 
 출력 스키마:
 {
   "goal": "사용자의 목표를 한 문장으로 요약",
   "steps": [
     {
-      "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep | git_status | git_log",
+      "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep | git_status | git_log | head | tail | wc | git_diff | git_branch",
       "target": "optional target path or name",
-      "pattern": "optional search pattern",
+      "pattern": "optional search pattern or line count",
       "recursive": false,
       "reason": "이 step이 필요한 이유"
     }
@@ -96,6 +101,51 @@ git 상태 확인하고 최근 커밋 보여줘
       "target": "5",
       "recursive": false,
       "reason": "최근 커밋 목록을 확인하기 위해 필요하다"
+    }
+  ]
+}
+
+예시 4
+사용자:
+README 앞부분을 보고 줄 수도 세줘
+
+출력:
+{
+  "goal": "README 앞부분과 줄 수를 확인한다",
+  "steps": [
+    {
+      "action": "head",
+      "target": "README.md",
+      "pattern": "10",
+      "recursive": false,
+      "reason": "README 파일의 앞부분을 확인하기 위해 필요하다"
+    },
+    {
+      "action": "wc",
+      "target": "README.md",
+      "recursive": false,
+      "reason": "README 파일의 줄 수를 확인하기 위해 필요하다"
+    }
+  ]
+}
+
+예시 5
+사용자:
+현재 브랜치와 변경사항 요약 보여줘
+
+출력:
+{
+  "goal": "현재 git 브랜치와 변경사항 요약을 확인한다",
+  "steps": [
+    {
+      "action": "git_branch",
+      "recursive": false,
+      "reason": "현재 작업 중인 git 브랜치를 확인하기 위해 필요하다"
+    },
+    {
+      "action": "git_diff",
+      "recursive": false,
+      "reason": "working tree 변경사항 요약을 확인하기 위해 필요하다"
     }
   ]
 }

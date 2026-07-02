@@ -62,6 +62,11 @@ def test_build_reflection_prompt_includes_context():
     assert "Command failed with stderr" in prompt
     assert "git_status" in prompt
     assert "git_log" in prompt
+    assert "git_diff" in prompt
+    assert "git_branch" in prompt
+    assert "head" in prompt
+    assert "tail" in prompt
+    assert "wc" in prompt
 
 
 def test_clean_reflection_response_strips_markdown_json_fence():

@@ -23,6 +23,11 @@ def test_build_prompt_includes_query_and_few_shot_examples():
     assert '"action": "show_history"' in prompt
     assert "git_status" in prompt
     assert "git_log" in prompt
+    assert "git_diff" in prompt
+    assert "git_branch" in prompt
+    assert "head" in prompt
+    assert "tail" in prompt
+    assert "wc" in prompt
 
 
 def test_parse_with_gemini_strips_markdown_json_fence(monkeypatch):
@@ -70,3 +75,31 @@ def test_parse_with_gemini_accepts_git_action(monkeypatch):
     intent = llm_parser.parse_with_gemini("git 상태 보여줘")
 
     assert intent.action == "git_status"
+
+
+def test_parse_with_gemini_accepts_git_branch_action(monkeypatch):
+    monkeypatch.setattr(
+        llm_parser,
+        "get_client",
+        lambda: fake_client('{"action": "git_branch"}')
+    )
+
+    intent = llm_parser.parse_with_gemini("현재 브랜치 보여줘")
+
+    assert intent.action == "git_branch"
+
+
+def test_parse_with_gemini_accepts_file_inspection_action(monkeypatch):
+    monkeypatch.setattr(
+        llm_parser,
+        "get_client",
+        lambda: fake_client(
+            '{"action": "head", "target": "README.md", "pattern": "20"}'
+        )
+    )
+
+    intent = llm_parser.parse_with_gemini("README 앞부분 20줄 보여줘")
+
+    assert intent.action == "head"
+    assert intent.target == "README.md"
+    assert intent.pattern == "20"

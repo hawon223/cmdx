@@ -14,7 +14,7 @@
 - 위험하거나 파괴적인 action을 제안하지 마세요.
 
 지원 action:
-list_files, find_file, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log
+list_files, find_file, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log, head, tail, wc, git_diff, git_branch
 
 출력 스키마:
 {

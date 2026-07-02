@@ -135,3 +135,78 @@ class GitLogTool(BaseTool):
             limit = intent.target
 
         return f"git log --oneline -{limit}"
+
+
+class GitDiffTool(BaseTool):
+    action = "git_diff"
+
+    def build(self, intent: Intent, current_os: str):
+        target = quoted_target(intent)
+
+        if target:
+            return f"git diff --stat -- {target}"
+
+        return "git diff --stat"
+
+
+class GitBranchTool(BaseTool):
+    action = "git_branch"
+
+    def build(self, intent: Intent, current_os: str):
+        return "git branch --show-current"
+
+
+def _line_limit(intent: Intent):
+    if intent.pattern and intent.pattern.isdigit():
+        return intent.pattern
+
+    return "10"
+
+
+class HeadTool(BaseTool):
+    action = "head"
+
+    def build(self, intent: Intent, current_os: str):
+        target = quoted_target(intent)
+
+        if not target:
+            return UNSUPPORTED_COMMAND
+
+        limit = _line_limit(intent)
+
+        if current_os == "windows":
+            return f"powershell -Command \"Get-Content {target} -TotalCount {limit}\""
+
+        return f"head -n {limit} {target}"
+
+
+class TailTool(BaseTool):
+    action = "tail"
+
+    def build(self, intent: Intent, current_os: str):
+        target = quoted_target(intent)
+
+        if not target:
+            return UNSUPPORTED_COMMAND
+
+        limit = _line_limit(intent)
+
+        if current_os == "windows":
+            return f"powershell -Command \"Get-Content {target} -Tail {limit}\""
+
+        return f"tail -n {limit} {target}"
+
+
+class WcTool(BaseTool):
+    action = "wc"
+
+    def build(self, intent: Intent, current_os: str):
+        target = quoted_target(intent)
+
+        if not target:
+            return UNSUPPORTED_COMMAND
+
+        if current_os == "windows":
+            return f"powershell -Command \"(Get-Content {target}).Count\""
+
+        return f"wc -l {target}"

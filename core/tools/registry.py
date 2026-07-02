@@ -2,14 +2,19 @@ from core.tools.command_tools import (
     CatTool,
     DeleteFilesTool,
     FindFileTool,
+    GitBranchTool,
+    GitDiffTool,
     GitLogTool,
     GitStatusTool,
     GrepTool,
+    HeadTool,
     ListFilesTool,
     MkdirTool,
     PwdTool,
     ShowHistoryTool,
+    TailTool,
     TouchTool,
+    WcTool,
 )
 
 TOOLS = [
@@ -24,6 +29,11 @@ TOOLS = [
     GrepTool(),
     GitStatusTool(),
     GitLogTool(),
+    GitDiffTool(),
+    GitBranchTool(),
+    HeadTool(),
+    TailTool(),
+    WcTool(),
 ]
 
 TOOL_REGISTRY = {tool.action: tool for tool in TOOLS}

@@ -4,7 +4,7 @@
 마크다운 코드블록, 설명 문장, 주석은 출력하지 마세요.
 
 action은 반드시 다음 중 하나만 사용하세요:
-list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log
+list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log, head, tail, wc, git_diff, git_branch
 
 비슷한 표현은 아래 표준 action으로 맞추세요:
 - view_history, display_history, history -> show_history
@@ -16,12 +16,17 @@ list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep,
 - read_file, show_file, display_file -> cat
 - show_git_status, git_state, repository_status -> git_status
 - show_git_log, git_history, commit_history -> git_log
+- show_head, file_head, first_lines -> head
+- show_tail, file_tail, last_lines -> tail
+- line_count, count_lines, word_count -> wc
+- show_git_diff, git_changes, repository_diff -> git_diff
+- show_git_branch, current_branch, current_git_branch -> git_branch
 
 출력 스키마:
 {
-  "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep | git_status | git_log",
+  "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep | git_status | git_log | head | tail | wc | git_diff | git_branch",
   "target": "optional target path or name",
-  "pattern": "optional search pattern",
+  "pattern": "optional search pattern or line count",
   "recursive": false
 }
 
@@ -86,6 +91,49 @@ git 상태 보여줘
 {
   "action": "git_log",
   "target": "5",
+  "recursive": false
+}
+
+예시 7
+사용자:
+README 앞부분 20줄 보여줘
+
+출력:
+{
+  "action": "head",
+  "target": "README.md",
+  "pattern": "20",
+  "recursive": false
+}
+
+예시 8
+사용자:
+README 줄 수 세줘
+
+출력:
+{
+  "action": "wc",
+  "target": "README.md",
+  "recursive": false
+}
+
+예시 9
+사용자:
+현재 git 브랜치 보여줘
+
+출력:
+{
+  "action": "git_branch",
+  "recursive": false
+}
+
+예시 10
+사용자:
+git 변경사항 요약해줘
+
+출력:
+{
+  "action": "git_diff",
   "recursive": false
 }
 

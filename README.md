@@ -367,6 +367,11 @@ cat
 grep
 git_status
 git_log
+git_diff
+git_branch
+head
+tail
+wc
 ```
 
 ## Safety Layer
@@ -454,6 +459,18 @@ Git 상태와 최근 커밋을 multi-step으로 확인하기:
 
 ```bash
 uv run cmdx agent "git 상태 확인하고 최근 커밋 보여줘"
+```
+
+현재 브랜치와 변경 요약 확인하기:
+
+```bash
+uv run cmdx agent "현재 브랜치와 변경사항 요약 보여줘"
+```
+
+파일 앞부분과 줄 수를 multi-step으로 확인하기:
+
+```bash
+uv run cmdx agent "README 앞부분을 보고 줄 수도 세줘"
 ```
 
 안전한 step을 실제 실행까지 진행하기:

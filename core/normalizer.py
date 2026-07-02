@@ -35,6 +35,23 @@ ACTION_MAPPINGS = {
     "show_git_log": "git_log",
     "git_history": "git_log",
     "commit_history": "git_log",
+    "show_head": "head",
+    "file_head": "head",
+    "first_lines": "head",
+    "show_tail": "tail",
+    "file_tail": "tail",
+    "last_lines": "tail",
+    "line_count": "wc",
+    "count_lines": "wc",
+    "word_count": "wc",
+    "git_diff": "git_diff",
+    "show_git_diff": "git_diff",
+    "git_changes": "git_diff",
+    "repository_diff": "git_diff",
+    "git_branch": "git_branch",
+    "show_git_branch": "git_branch",
+    "current_branch": "git_branch",
+    "current_git_branch": "git_branch",
 }
 
 

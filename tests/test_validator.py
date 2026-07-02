@@ -16,6 +16,18 @@ def test_validate_intent_accepts_git_action():
     assert validate_intent(intent) is True
 
 
+def test_validate_intent_accepts_git_diff_action():
+    intent = Intent(action="git_diff")
+
+    assert validate_intent(intent) is True
+
+
+def test_validate_intent_accepts_file_inspection_action():
+    intent = Intent(action="head", target="README.md")
+
+    assert validate_intent(intent) is True
+
+
 def test_validate_intent_rejects_unknown_action():
     intent = Intent.model_construct(action="unknown_action")
 

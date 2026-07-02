@@ -14,6 +14,11 @@ def test_tool_registry_contains_supported_actions():
         "grep",
         "git_status",
         "git_log",
+        "git_diff",
+        "git_branch",
+        "head",
+        "tail",
+        "wc",
     }
 
 

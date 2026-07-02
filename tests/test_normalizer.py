@@ -29,6 +29,26 @@ def test_normalize_git_log_alias():
     assert normalize_action("commit_history") == "git_log"
 
 
+def test_normalize_git_diff_alias():
+    assert normalize_action("git_changes") == "git_diff"
+
+
+def test_normalize_git_branch_alias():
+    assert normalize_action("current_branch") == "git_branch"
+
+
+def test_normalize_head_alias():
+    assert normalize_action("first_lines") == "head"
+
+
+def test_normalize_tail_alias():
+    assert normalize_action("last_lines") == "tail"
+
+
+def test_normalize_wc_alias():
+    assert normalize_action("line_count") == "wc"
+
+
 def test_normalize_intent_data_keeps_unknown_action():
     result = normalize_intent_data({"action": "unknown_action"})
 
