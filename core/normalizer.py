@@ -27,6 +27,14 @@ ACTION_MAPPINGS = {
     "find_files": "find_file",
     "list": "list_files",
     "list_directory": "list_files",
+    "git_status": "git_status",
+    "show_git_status": "git_status",
+    "git_state": "git_status",
+    "repository_status": "git_status",
+    "git_log": "git_log",
+    "show_git_log": "git_log",
+    "git_history": "git_log",
+    "commit_history": "git_log",
 }
 
 

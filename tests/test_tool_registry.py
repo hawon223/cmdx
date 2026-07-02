@@ -12,6 +12,8 @@ def test_tool_registry_contains_supported_actions():
         "touch",
         "cat",
         "grep",
+        "git_status",
+        "git_log",
     }
 
 

@@ -99,3 +99,51 @@ def test_generate_recursive_grep():
     command = generate(intent)
 
     assert command == "grep -R TODO ."
+
+
+def test_generate_git_status():
+    intent = Intent(
+        action="git_status",
+        target=None,
+        recursive=False
+    )
+
+    command = generate(intent)
+
+    assert command == "git status --short"
+
+
+def test_generate_git_log_default_limit():
+    intent = Intent(
+        action="git_log",
+        target=None,
+        recursive=False
+    )
+
+    command = generate(intent)
+
+    assert command == "git log --oneline -5"
+
+
+def test_generate_git_log_custom_limit():
+    intent = Intent(
+        action="git_log",
+        target="3",
+        recursive=False
+    )
+
+    command = generate(intent)
+
+    assert command == "git log --oneline -3"
+
+
+def test_generate_git_log_ignores_non_numeric_limit():
+    intent = Intent(
+        action="git_log",
+        target="main",
+        recursive=False
+    )
+
+    command = generate(intent)
+
+    assert command == "git log --oneline -5"

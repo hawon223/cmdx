@@ -4,7 +4,7 @@
 마크다운 코드블록, 설명 문장, 주석은 출력하지 마세요.
 
 action은 반드시 다음 중 하나만 사용하세요:
-list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
+list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log
 
 비슷한 표현은 아래 표준 action으로 맞추세요:
 - view_history, display_history, history -> show_history
@@ -14,10 +14,12 @@ list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
 - create_directory, make_directory, new_directory -> mkdir
 - create_file, new_file -> touch
 - read_file, show_file, display_file -> cat
+- show_git_status, git_state, repository_status -> git_status
+- show_git_log, git_history, commit_history -> git_log
 
 출력 스키마:
 {
-  "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep",
+  "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep | git_status | git_log",
   "target": "optional target path or name",
   "pattern": "optional search pattern",
   "recursive": false
@@ -63,6 +65,27 @@ README에서 install 찾아줘
 출력:
 {
   "action": "pwd",
+  "recursive": false
+}
+
+예시 5
+사용자:
+git 상태 보여줘
+
+출력:
+{
+  "action": "git_status",
+  "recursive": false
+}
+
+예시 6
+사용자:
+최근 커밋 보여줘
+
+출력:
+{
+  "action": "git_log",
+  "target": "5",
   "recursive": false
 }
 

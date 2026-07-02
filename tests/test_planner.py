@@ -18,6 +18,8 @@ def test_build_planner_prompt_includes_query_and_schema():
     assert "README 찾아서 보여줘" in prompt
     assert "shell command를 직접 만들지 마세요." in prompt
     assert '"steps"' in prompt
+    assert "git_status" in prompt
+    assert "git_log" in prompt
 
 
 def test_clean_plan_response_strips_markdown_json_fence():
@@ -74,3 +76,36 @@ def test_parse_plan_with_gemini(monkeypatch):
     assert len(plan.steps) == 2
     assert plan.steps[0].action == "find_file"
     assert plan.steps[1].action == "cat"
+
+
+def test_parse_plan_with_gemini_accepts_git_steps(monkeypatch):
+    raw_plan = """
+    {
+      "goal": "git 상태와 최근 커밋을 확인한다",
+      "steps": [
+        {
+          "action": "git_status",
+          "recursive": false,
+          "reason": "working tree 상태를 확인한다"
+        },
+        {
+          "action": "git_log",
+          "target": "5",
+          "recursive": false,
+          "reason": "최근 커밋을 확인한다"
+        }
+      ]
+    }
+    """
+
+    monkeypatch.setattr(
+        planner,
+        "get_client",
+        lambda: fake_client(raw_plan)
+    )
+
+    plan = planner.parse_plan_with_gemini("git 상태와 최근 커밋 보여줘")
+
+    assert plan.steps[0].action == "git_status"
+    assert plan.steps[1].action == "git_log"
+    assert plan.steps[1].target == "5"

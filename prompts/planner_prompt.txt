@@ -10,7 +10,7 @@
 - steps는 1개 이상 5개 이하로 작성하세요.
 
 지원 action:
-list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
+list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep, git_status, git_log
 
 비슷한 표현은 아래 표준 action으로 맞추세요:
 - view_history, display_history, history -> show_history
@@ -20,13 +20,15 @@ list_files, find_file, delete_files, show_history, pwd, mkdir, touch, cat, grep
 - create_directory, make_directory, new_directory -> mkdir
 - create_file, new_file -> touch
 - read_file, show_file, display_file -> cat
+- show_git_status, git_state, repository_status -> git_status
+- show_git_log, git_history, commit_history -> git_log
 
 출력 스키마:
 {
   "goal": "사용자의 목표를 한 문장으로 요약",
   "steps": [
     {
-      "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep",
+      "action": "list_files | find_file | delete_files | show_history | pwd | mkdir | touch | cat | grep | git_status | git_log",
       "target": "optional target path or name",
       "pattern": "optional search pattern",
       "recursive": false,
@@ -72,6 +74,28 @@ README에서 install 찾아줘
       "pattern": "install",
       "recursive": false,
       "reason": "README 파일에서 install 문자열을 찾기 위해 필요하다"
+    }
+  ]
+}
+
+예시 3
+사용자:
+git 상태 확인하고 최근 커밋 보여줘
+
+출력:
+{
+  "goal": "git 상태와 최근 커밋을 확인한다",
+  "steps": [
+    {
+      "action": "git_status",
+      "recursive": false,
+      "reason": "현재 working tree 상태를 확인하기 위해 필요하다"
+    },
+    {
+      "action": "git_log",
+      "target": "5",
+      "recursive": false,
+      "reason": "최근 커밋 목록을 확인하기 위해 필요하다"
     }
   ]
 }

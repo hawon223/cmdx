@@ -31,6 +31,24 @@ def test_plan_accepts_supported_steps():
     assert plan.steps[0].action == "find_file"
 
 
+def test_plan_accepts_git_steps():
+    plan = Plan(
+        goal="git 상태와 최근 커밋을 확인한다",
+        steps=[
+            {
+                "action": "git_status"
+            },
+            {
+                "action": "git_log",
+                "target": "5"
+            }
+        ]
+    )
+
+    assert plan.steps[0].action == "git_status"
+    assert plan.steps[1].action == "git_log"
+
+
 def test_plan_rejects_unknown_action():
     with pytest.raises(ValidationError):
         Plan(

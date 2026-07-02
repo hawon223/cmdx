@@ -60,6 +60,8 @@ def test_build_reflection_prompt_includes_context():
     assert "README 찾아서 보여줘" in prompt
     assert "README 파일을 찾아 출력한다" in prompt
     assert "Command failed with stderr" in prompt
+    assert "git_status" in prompt
+    assert "git_log" in prompt
 
 
 def test_clean_reflection_response_strips_markdown_json_fence():

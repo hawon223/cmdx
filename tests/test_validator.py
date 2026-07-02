@@ -10,6 +10,12 @@ def test_validate_intent_accepts_allowed_action():
     assert validate_intent(intent) is True
 
 
+def test_validate_intent_accepts_git_action():
+    intent = Intent(action="git_status")
+
+    assert validate_intent(intent) is True
+
+
 def test_validate_intent_rejects_unknown_action():
     intent = Intent.model_construct(action="unknown_action")
 

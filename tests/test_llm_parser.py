@@ -21,6 +21,8 @@ def test_build_prompt_includes_query_and_few_shot_examples():
     assert "히스토리 보여줘" in prompt
     assert "view_history, display_history, history -> show_history" in prompt
     assert '"action": "show_history"' in prompt
+    assert "git_status" in prompt
+    assert "git_log" in prompt
 
 
 def test_parse_with_gemini_strips_markdown_json_fence(monkeypatch):
@@ -56,3 +58,15 @@ def test_parse_with_gemini_normalizes_action_alias(monkeypatch):
     intent = llm_parser.parse_with_gemini("히스토리 보여줘")
 
     assert intent.action == "show_history"
+
+
+def test_parse_with_gemini_accepts_git_action(monkeypatch):
+    monkeypatch.setattr(
+        llm_parser,
+        "get_client",
+        lambda: fake_client('{"action": "git_status"}')
+    )
+
+    intent = llm_parser.parse_with_gemini("git 상태 보여줘")
+
+    assert intent.action == "git_status"

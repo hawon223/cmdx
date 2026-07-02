@@ -13,7 +13,9 @@ class Intent(BaseModel):
         "mkdir",
         "touch",
         "cat",
-        "grep"
+        "grep",
+        "git_status",
+        "git_log"
     ]
 
     target: Optional[str] = None

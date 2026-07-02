@@ -10,7 +10,9 @@ PlanAction = Literal[
     "mkdir",
     "touch",
     "cat",
-    "grep"
+    "grep",
+    "git_status",
+    "git_log"
 ]
 
 

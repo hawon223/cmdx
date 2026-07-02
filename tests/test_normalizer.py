@@ -21,6 +21,14 @@ def test_normalize_grep_alias():
     assert normalize_action("search_text") == "grep"
 
 
+def test_normalize_git_status_alias():
+    assert normalize_action("show_git_status") == "git_status"
+
+
+def test_normalize_git_log_alias():
+    assert normalize_action("commit_history") == "git_log"
+
+
 def test_normalize_intent_data_keeps_unknown_action():
     result = normalize_intent_data({"action": "unknown_action"})
 

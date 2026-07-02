@@ -303,7 +303,7 @@ PHASE 11 Planner                         기반 추가
 PHASE 12 Observation                     기반 추가
 PHASE 13 Multi-step Agent Loop           기반 추가
 PHASE 14 Reflection                      기반 추가
-PHASE 15 Tool Expansion                  예정
+PHASE 15 Tool Expansion                  진행 중
 PHASE 16 Session Memory                  예정
 PHASE 17 Portfolio Demo                  예정
 ```
@@ -365,6 +365,8 @@ mkdir
 touch
 cat
 grep
+git_status
+git_log
 ```
 
 ## Safety Layer
@@ -446,6 +448,12 @@ Planner 기반 multi-step agent dry-run:
 
 ```bash
 uv run cmdx agent "README 찾아서 보여줘"
+```
+
+Git 상태와 최근 커밋을 multi-step으로 확인하기:
+
+```bash
+uv run cmdx agent "git 상태 확인하고 최근 커밋 보여줘"
 ```
 
 안전한 step을 실제 실행까지 진행하기:

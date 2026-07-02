@@ -116,3 +116,22 @@ class GrepTool(BaseTool):
             return f"grep -R {pattern} {target}"
 
         return f"grep {pattern} {target}"
+
+
+class GitStatusTool(BaseTool):
+    action = "git_status"
+
+    def build(self, intent: Intent, current_os: str):
+        return "git status --short"
+
+
+class GitLogTool(BaseTool):
+    action = "git_log"
+
+    def build(self, intent: Intent, current_os: str):
+        limit = "5"
+
+        if intent.target and intent.target.isdigit():
+            limit = intent.target
+
+        return f"git log --oneline -{limit}"

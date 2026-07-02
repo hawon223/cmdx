@@ -2,6 +2,8 @@ from core.tools.command_tools import (
     CatTool,
     DeleteFilesTool,
     FindFileTool,
+    GitLogTool,
+    GitStatusTool,
     GrepTool,
     ListFilesTool,
     MkdirTool,
@@ -20,6 +22,8 @@ TOOLS = [
     TouchTool(),
     CatTool(),
     GrepTool(),
+    GitStatusTool(),
+    GitLogTool(),
 ]
 
 TOOL_REGISTRY = {tool.action: tool for tool in TOOLS}
