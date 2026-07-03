@@ -304,7 +304,7 @@ PHASE 12 Observation                     기반 추가
 PHASE 13 Multi-step Agent Loop           기반 추가
 PHASE 14 Reflection                      기반 추가
 PHASE 15 Tool Expansion                  진행 중
-PHASE 16 Session Memory                  예정
+PHASE 16 Session Memory                  기반 추가
 PHASE 17 Portfolio Demo                  예정
 ```
 

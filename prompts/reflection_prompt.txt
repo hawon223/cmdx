@@ -71,3 +71,6 @@ observation: Command failed with error: subprocess unavailable
 
 Observation:
 {{OBSERVATION}}
+
+Session Memory:
+{{SESSION_MEMORY}}

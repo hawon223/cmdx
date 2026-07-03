@@ -49,6 +49,7 @@ def test_run_agent_dry_run(monkeypatch):
     assert result.steps[0].command == 'find . -name "README.md"'
     assert result.steps[1].command == "cat README.md"
     assert result.steps[0].observation is None
+    assert result.memory.observations == []
 
 
 def test_run_agent_blocks_high_risk_step(monkeypatch):
@@ -115,6 +116,9 @@ def test_run_agent_execute_adds_observation(monkeypatch):
     assert result.steps[0].observation.summary == (
         "Command succeeded with output: /tmp/project"
     )
+    assert result.memory.to_prompt_context() == (
+        "1. pwd: Command succeeded with output: /tmp/project"
+    )
 
 
 def test_run_agent_stops_on_execution_failure(monkeypatch):
@@ -145,9 +149,9 @@ def test_run_agent_stops_on_execution_failure(monkeypatch):
     monkeypatch.setattr(
         agent,
         "safe_reflect_on_failure",
-        lambda query, goal, failed_step, observation: Reflection(
+        lambda query, goal, failed_step, observation, session_context: Reflection(
             status="retry",
-            reason="missing.txt 경로를 다시 찾아야 한다",
+            reason=f"missing.txt 경로를 다시 찾아야 한다: {session_context}",
             next_step=PlanStep(action="find_file", target="missing.txt")
         )
     )
@@ -163,6 +167,7 @@ def test_run_agent_stops_on_execution_failure(monkeypatch):
     assert result.steps[0].status == "failed"
     assert result.steps[0].reflection is not None
     assert result.steps[0].reflection.status == "retry"
+    assert "No such file or directory" in result.steps[0].reflection.reason
     assert result.steps[0].reflection.next_step.action == "find_file"
     assert result.stopped_reason == (
         "Command failed with stderr: No such file or directory"
@@ -196,7 +201,7 @@ def test_run_agent_respects_max_steps(monkeypatch):
 
 
 def test_safe_reflect_on_failure_returns_stop_when_reflection_fails(monkeypatch):
-    def raise_error(query, goal, failed_step, observation):
+    def raise_error(query, goal, failed_step, observation, session_context):
         raise ValueError("invalid reflection")
 
     monkeypatch.setattr(agent, "reflect_on_failure", raise_error)

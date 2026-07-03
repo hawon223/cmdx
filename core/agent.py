@@ -11,6 +11,7 @@ from core.policy import check_policy
 from core.reflection import Reflection, reflect_on_failure
 from core.risk_analyzer import analyze
 from core.schema import Intent
+from core.session_memory import SessionMemory
 
 BLOCKING_RISKS = {"HIGH", "CRITICAL"}
 
@@ -33,6 +34,7 @@ class AgentRunResult(BaseModel):
     dry_run: bool
     completed: bool
     steps: list[AgentStepResult] = Field(default_factory=list)
+    memory: SessionMemory = Field(default_factory=SessionMemory)
     stopped_reason: Optional[str] = None
 
 
@@ -110,6 +112,7 @@ def run_agent(query: str, dry_run: bool = True, max_steps: int = 3):
             command=command,
             result=execution_result
         )
+        result.memory.add_observation(observation)
 
         status = "executed" if observation.success else "failed"
         result.steps.append(
@@ -129,7 +132,8 @@ def run_agent(query: str, dry_run: bool = True, max_steps: int = 3):
                 query=query,
                 goal=plan.goal,
                 failed_step=step,
-                observation=observation
+                observation=observation,
+                session_context=result.memory.to_prompt_context()
             )
             result.steps[-1].reflection = reflection
             result.completed = False
@@ -147,14 +151,16 @@ def safe_reflect_on_failure(
     query: str,
     goal: str,
     failed_step: PlanStep,
-    observation: Observation
+    observation: Observation,
+    session_context: str = ""
 ):
     try:
         return reflect_on_failure(
             query=query,
             goal=goal,
             failed_step=failed_step,
-            observation=observation
+            observation=observation,
+            session_context=session_context
         )
     except Exception as e:
         return Reflection(

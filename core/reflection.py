@@ -22,7 +22,8 @@ def build_reflection_prompt(
     query: str,
     goal: str,
     failed_step: PlanStep,
-    observation: Observation
+    observation: Observation,
+    session_context: str = ""
 ):
     template = files("prompts").joinpath(REFLECTION_PROMPT_NAME).read_text(
         encoding="utf-8"
@@ -33,6 +34,7 @@ def build_reflection_prompt(
         .replace("{{GOAL}}", goal)
         .replace("{{FAILED_STEP}}", failed_step.model_dump_json())
         .replace("{{OBSERVATION}}", observation.summary)
+        .replace("{{SESSION_MEMORY}}", session_context or "No previous observations.")
     )
 
 
@@ -64,13 +66,15 @@ def reflect_on_failure(
     query: str,
     goal: str,
     failed_step: PlanStep,
-    observation: Observation
+    observation: Observation,
+    session_context: str = ""
 ):
     prompt = build_reflection_prompt(
         query=query,
         goal=goal,
         failed_step=failed_step,
-        observation=observation
+        observation=observation,
+        session_context=session_context
     )
 
     response = get_client().models.generate_content(
