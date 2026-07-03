@@ -491,6 +491,19 @@ history 출력 개수 제한:
 uv run cmdx history --limit 5
 ```
 
+## Demo
+
+포트폴리오 시연용 대표 흐름은 [docs/demo.md](docs/demo.md)에 정리했습니다.
+
+포함된 시나리오:
+
+- 기본 명령어 생성
+- Planner 기반 multi-step agent
+- Git workflow
+- 파일 inspection
+- 위험 명령 차단
+- Session Memory
+
 ## 예시 흐름
 
 입력:
