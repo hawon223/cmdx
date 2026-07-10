@@ -230,6 +230,9 @@ def test_run_agent_retries_reflection_next_step(monkeypatch):
     assert result.steps[1].status == "executed"
     assert result.steps[1].action == "find_file"
     assert result.steps[1].command == 'find . -name "missing.txt"'
+    assert result.retry_count == 1
+    assert "cat: Command failed" in result.memory_summary
+    assert "find_file: Command succeeded" in result.memory_summary
 
 
 def test_run_agent_respects_max_steps(monkeypatch):

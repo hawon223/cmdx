@@ -99,6 +99,8 @@ def agent(
     summary.add_row("Goal", result.goal)
     summary.add_row("Mode", "execute" if execute_steps else "dry-run")
     summary.add_row("Completed", str(result.completed))
+    summary.add_row("Steps", str(len(result.steps)))
+    summary.add_row("Retries", str(result.retry_count))
     if result.stopped_reason:
         summary.add_row("Stopped Reason", result.stopped_reason)
     console.print(Panel(summary, title="Agent Plan", border_style="blue"))
@@ -147,6 +149,15 @@ def agent(
                     border_style="yellow"
                 )
             )
+
+    if result.memory.observations:
+        console.print(
+            Panel(
+                result.memory_summary,
+                title="Session Memory",
+                border_style="cyan"
+            )
+        )
 
 @app.command()
 def ask(

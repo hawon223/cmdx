@@ -37,6 +37,18 @@ class AgentRunResult(BaseModel):
     memory: SessionMemory = Field(default_factory=SessionMemory)
     stopped_reason: Optional[str] = None
 
+    @property
+    def retry_count(self):
+        return sum(
+            1
+            for step in self.steps
+            if step.reflection and step.reflection.status == "retry"
+        )
+
+    @property
+    def memory_summary(self):
+        return self.memory.to_prompt_context()
+
 
 def plan_step_to_intent(step: PlanStep):
     return Intent(
