@@ -150,9 +150,9 @@ def test_run_agent_stops_on_execution_failure(monkeypatch):
         agent,
         "safe_reflect_on_failure",
         lambda query, goal, failed_step, observation, session_context: Reflection(
-            status="retry",
-            reason=f"missing.txt 경로를 다시 찾아야 한다: {session_context}",
-            next_step=PlanStep(action="find_file", target="missing.txt")
+            status="stop",
+            reason=f"missing.txt 경로를 찾을 수 없다: {session_context}",
+            next_step=None
         )
     )
 
@@ -166,12 +166,70 @@ def test_run_agent_stops_on_execution_failure(monkeypatch):
     assert len(result.steps) == 1
     assert result.steps[0].status == "failed"
     assert result.steps[0].reflection is not None
-    assert result.steps[0].reflection.status == "retry"
+    assert result.steps[0].reflection.status == "stop"
     assert "No such file or directory" in result.steps[0].reflection.reason
-    assert result.steps[0].reflection.next_step.action == "find_file"
+    assert result.steps[0].reflection.next_step is None
     assert result.stopped_reason == (
         "Command failed with stderr: No such file or directory"
     )
+
+
+def test_run_agent_retries_reflection_next_step(monkeypatch):
+    plan = Plan(
+        goal="없는 파일을 다시 찾아본다",
+        steps=[
+            PlanStep(action="cat", target="missing.txt"),
+        ]
+    )
+
+    monkeypatch.setattr(
+        agent,
+        "parse_plan_with_gemini",
+        lambda query: plan
+    )
+
+    def fake_execute(command):
+        if command == "cat missing.txt":
+            return {
+                "success": False,
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "No such file or directory\n",
+                "error": None,
+            }
+
+        return {
+            "success": True,
+            "returncode": 0,
+            "stdout": "./docs/missing.txt\n",
+            "stderr": "",
+            "error": None,
+        }
+
+    monkeypatch.setattr(agent, "execute", fake_execute)
+    monkeypatch.setattr(
+        agent,
+        "safe_reflect_on_failure",
+        lambda query, goal, failed_step, observation, session_context: Reflection(
+            status="retry",
+            reason="파일 위치를 먼저 찾아야 한다",
+            next_step=PlanStep(action="find_file", target="missing.txt")
+        )
+    )
+
+    result = run_agent(
+        query="없는 파일 찾아줘",
+        dry_run=False,
+        max_steps=3
+    )
+
+    assert result.completed is True
+    assert len(result.steps) == 2
+    assert result.steps[0].status == "failed"
+    assert result.steps[0].reflection.status == "retry"
+    assert result.steps[1].status == "executed"
+    assert result.steps[1].action == "find_file"
+    assert result.steps[1].command == 'find . -name "missing.txt"'
 
 
 def test_run_agent_respects_max_steps(monkeypatch):

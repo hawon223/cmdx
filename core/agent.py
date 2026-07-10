@@ -55,9 +55,11 @@ def run_agent(query: str, dry_run: bool = True, max_steps: int = 3):
         completed=True
     )
 
-    steps = plan.steps[:max_steps]
+    pending_steps = list(plan.steps)
 
-    for index, step in enumerate(steps, start=1):
+    while pending_steps and len(result.steps) < max_steps:
+        index = len(result.steps) + 1
+        step = pending_steps.pop(0)
         command = generate(plan_step_to_intent(step))
         risk_result = analyze(command)
         policy_result = check_policy(command)
@@ -136,11 +138,19 @@ def run_agent(query: str, dry_run: bool = True, max_steps: int = 3):
                 session_context=result.memory.to_prompt_context()
             )
             result.steps[-1].reflection = reflection
+
+            if reflection.status == "retry" and reflection.next_step:
+                pending_steps.insert(0, reflection.next_step)
+                continue
+
+            if reflection.status == "continue":
+                continue
+
             result.completed = False
             result.stopped_reason = observation.summary
             break
 
-    if result.completed and len(plan.steps) > max_steps:
+    if result.completed and pending_steps:
         result.completed = False
         result.stopped_reason = f"Stopped after max_steps={max_steps}"
 

@@ -247,16 +247,21 @@ plan
 step별 command / risk / policy / observation
 ```
 
-아직 아래 기능은 구현되어 있지 않습니다.
+현재 agent loop는 실패한 step에 대해 reflection을 수행하고, reflection이 `retry`와 `next_step`을 반환하면 해당 step을 다시 실행 큐에 넣을 수 있습니다.
 
 ```text
-Automatic retry
-Self-correction loop
+Failure
+  ↓
+Observation
+  ↓
+Reflection
+  ↓
+Retry next_step
 ```
 
-Planner, Observation, multi-step agent loop, Reflection의 기반은 추가되었지만, 아직 reflection 결과를 바탕으로 자동 재시도하는 self-correction loop까지는 연결되지 않았습니다.
+Planner, Observation, multi-step agent loop, Reflection, Session Memory, Self-correction Loop의 기반이 연결되어 있습니다.
 
-따라서 이 프로젝트는 `AI Shell Agent`라기보다 **Safe AI CLI** 또는 **Trustworthy AI Shell Assistant**에 가깝습니다.
+다만 아직 장기 메모리, 복잡한 planning 재작성, 여러 retry 후보 비교까지 포함한 완전한 autonomous agent는 아닙니다.
 
 ## v2 방향
 
@@ -305,7 +310,8 @@ PHASE 13 Multi-step Agent Loop           기반 추가
 PHASE 14 Reflection                      기반 추가
 PHASE 15 Tool Expansion                  진행 중
 PHASE 16 Session Memory                  기반 추가
-PHASE 17 Portfolio Demo                  예정
+PHASE 17 Portfolio Demo                  완료
+PHASE 18 Self-correction Loop            기반 추가
 ```
 
 ## 프로젝트 구조
