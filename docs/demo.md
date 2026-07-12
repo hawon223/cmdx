@@ -158,8 +158,56 @@ Reflection Prompt Context
 - 실패한 step 하나만 보는 것이 아니라 이전 실행 맥락을 함께 볼 수 있음
 - reflection이 다음 행동을 판단할 때 최근 observation summary를 참고할 수 있음
 
+## 7. Self-correction Loop
+
+실패한 step에 대해 reflection이 `retry`와 `next_step`을 반환하면, agent는 해당 step을 실행 큐에 다시 넣습니다.
+
+```text
+Step failed
+  ↓
+Observation
+  ↓
+Reflection(status="retry", next_step=...)
+  ↓
+Retry next_step
+```
+
+이 시나리오에서 보여줄 점:
+
+- 실패가 곧바로 종료로 이어지지 않음
+- reflection 결과가 실제 다음 실행으로 연결됨
+- `max_steps` 안에서 retry loop가 통제됨
+
+## 8. Agent Result UX
+
+agent 실행 결과는 step 목록뿐 아니라 retry 횟수와 Session Memory 요약도 함께 보여줍니다.
+
+```text
+Agent Plan
+- Goal
+- Mode
+- Completed
+- Steps
+- Retries
+
+Agent Steps
+- action
+- status
+- risk
+- command
+
+Session Memory
+- recent observation summaries
+```
+
+이 시나리오에서 보여줄 점:
+
+- multi-step 실행 결과를 한눈에 볼 수 있음
+- retry가 발생했는지 확인할 수 있음
+- observation context가 사용자에게도 노출됨
+
 ## 면접에서 설명할 한 문장
 
 ```text
-cmdX는 LLM에게 command 실행 권한을 직접 주지 않고, intent parsing만 맡긴 뒤 deterministic safety pipeline을 통과시켜 실행 가능성을 판단하는 Safe AI CLI입니다.
+cmdX는 LLM에게 command 실행 권한을 직접 주지 않고, intent parsing과 planning만 맡긴 뒤 deterministic safety pipeline과 self-correction loop를 통해 실행 가능성을 판단하는 Safe AI CLI입니다.
 ```

@@ -37,7 +37,10 @@ cmdX는 아래 관점을 기준으로 설계했습니다.
 - dry-run 모드
 - JSONL 기반 실행 history
 - 지원하지 않는 intent를 위한 AI fallback command suggestion
-- parser, generator, tools, safety, logger, executor, fallback 테스트
+- Planner 기반 multi-step agent
+- 실패 step에 대한 reflection / retry 기반 self-correction loop
+- Session Memory 기반 observation context 전달
+- parser, generator, tools, safety, logger, executor, fallback, agent 테스트
 
 ## 차별점
 
@@ -308,11 +311,12 @@ PHASE 11 Planner                         기반 추가
 PHASE 12 Observation                     기반 추가
 PHASE 13 Multi-step Agent Loop           기반 추가
 PHASE 14 Reflection                      기반 추가
-PHASE 15 Tool Expansion                  진행 중
+PHASE 15 Tool Expansion                  완료
 PHASE 16 Session Memory                  기반 추가
 PHASE 17 Portfolio Demo                  완료
 PHASE 18 Self-correction Loop            기반 추가
 PHASE 19 Agent Result UX                 기반 추가
+PHASE 20 Release Cleanup                 완료
 ```
 
 ## 프로젝트 구조
@@ -436,7 +440,7 @@ Debian/Ubuntu 환경에서는 system Python에 직접 설치하지 않는 것이
 
 ## 환경 설정
 
-`ask` 명령은 Gemini API를 사용합니다.
+`ask`와 `agent` 명령은 Gemini API를 사용합니다.
 
 ```bash
 export GEMINI_API_KEY="your-api-key"
@@ -449,6 +453,36 @@ export GEMINI_API_KEY="your-api-key"
 ```bash
 uv run cmdx --help
 ```
+
+### ask vs agent
+
+`ask`는 하나의 자연어 요청을 하나의 intent와 command로 변환합니다.
+
+```text
+ask
+  ↓
+Intent 1개
+  ↓
+Command 1개
+```
+
+`agent`는 하나의 자연어 요청을 여러 step으로 나누고, 각 step마다 safety check와 observation을 수행합니다.
+
+```text
+agent
+  ↓
+Plan
+  ↓
+Step 1
+  ↓
+Step 2
+  ↓
+Observation / Reflection / Retry
+```
+
+`--dry-run`은 command를 실제로 실행하지 않고 생성 결과와 safety check만 확인하는 모드입니다.
+
+`--execute`는 agent step을 실제 실행합니다. 이 경우에도 각 step은 risk analysis와 policy check를 먼저 통과해야 합니다.
 
 명령어를 생성하고 분석하되 실제 실행은 하지 않기:
 
@@ -510,6 +544,8 @@ uv run cmdx history --limit 5
 - 파일 inspection
 - 위험 명령 차단
 - Session Memory
+- Self-correction Loop
+- Agent Result UX
 
 ## 예시 흐름
 
@@ -574,7 +610,15 @@ llm parser
 AI fallback
 agent loop
 reflection
+session memory
+self-correction loop
 explainer
+```
+
+현재 기준 전체 테스트:
+
+```text
+102 passed
 ```
 
 ## 기술 스택
